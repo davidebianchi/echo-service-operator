@@ -1,0 +1,12 @@
+apiVersion: echo-service-operator.davidebianchi.github.io/v1alpha1
+kind: EchoService
+metadata:
+  labels:
+    app.kubernetes.io/name: echoservice
+    app.kubernetes.io/instance: echoservice-sample
+    app.kubernetes.io/part-of: echo-service-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: echo-service-operator
+  name: echoservice-sample
+spec:
+  # TODO(user): Add fields here
