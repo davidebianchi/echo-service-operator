@@ -1,0 +1,6 @@
+apiVersion: echo-service-operator.davidebianchi.github.io/v1alpha1
+kind: EchoService
+metadata:
+  name: echo-service
+spec:
+  replicas: 3
