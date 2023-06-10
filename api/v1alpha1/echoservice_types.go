@@ -17,25 +17,32 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+	"strings"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+type EchoServiceConfig struct {
+	ResponseDelay string `json:"responseDelay,omitempty"`
+}
 
 // EchoServiceSpec defines the desired state of EchoService
 type EchoServiceSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of EchoService. Edit echoservice_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Image    string            `json:"image,omitempty"`
+	Version  string            `json:"version,omitempty"`
+	Replicas *int32            `json:"replicas,omitempty"`
+	Config   EchoServiceConfig `json:"config,omitempty"`
 }
 
 // EchoServiceStatus defines the observed state of EchoService
 type EchoServiceStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// TODO:
 }
 
 //+kubebuilder:object:root=true
@@ -61,4 +68,21 @@ type EchoServiceList struct {
 
 func init() {
 	SchemeBuilder.Register(&EchoService{}, &EchoServiceList{})
+}
+
+func (e EchoService) GetImage() string {
+	image := "davidebianchi/echo-service"
+	version := "latest"
+
+	if e.Spec.Image != "" {
+		image = e.Spec.Image
+	}
+	if !strings.Contains(image, ":") && e.Spec.Version != "" {
+		version = e.Spec.Version
+	}
+	return fmt.Sprintf("%s:%s", image, version)
+}
+
+func (e EchoService) GetReplicas() *int32 {
+	return e.Spec.Replicas
 }
