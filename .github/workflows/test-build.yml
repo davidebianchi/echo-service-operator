@@ -17,8 +17,9 @@ jobs:
         go_version: ['1.20']
         os: [ubuntu-latest]
         k8s_version:
-          - 'v1.26.3'
-          - 'v1.25.8'
+          - 'v1.27'
+          - 'v1.26'
+          - 'v1.25'
     steps:
       - uses: actions/checkout@v3
       - name: Use golang ${{ matrix.go_version }}
