@@ -227,17 +227,15 @@ func (r *EchoServiceReconciler) getDeployment(echoService *v1alpha1.EchoService)
 						}},
 						ReadinessProbe: &corev1.Probe{
 							ProbeHandler: corev1.ProbeHandler{
-								HTTPGet: &corev1.HTTPGetAction{
+								TCPSocket: &corev1.TCPSocketAction{
 									Port: intstr.FromString(echoServicePortName),
-									Path: "/-/ready",
 								},
 							},
 						},
 						LivenessProbe: &corev1.Probe{
 							ProbeHandler: corev1.ProbeHandler{
-								HTTPGet: &corev1.HTTPGetAction{
+								TCPSocket: &corev1.TCPSocketAction{
 									Port: intstr.FromString(echoServicePortName),
-									Path: "/-/healthz",
 								},
 							},
 						},

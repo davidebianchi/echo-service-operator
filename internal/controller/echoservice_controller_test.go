@@ -133,10 +133,8 @@ var _ = Describe("EchoService controller", func() {
 				TerminationMessagePolicy: "File",
 				ReadinessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
-						HTTPGet: &corev1.HTTPGetAction{
-							Path:   "/-/ready",
-							Port:   intstr.FromString(echoServicePortName),
-							Scheme: "HTTP",
+						TCPSocket: &corev1.TCPSocketAction{
+							Port: intstr.FromString(echoServicePortName),
 						},
 					},
 					TimeoutSeconds:   1,
@@ -146,10 +144,8 @@ var _ = Describe("EchoService controller", func() {
 				},
 				LivenessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
-						HTTPGet: &corev1.HTTPGetAction{
-							Path:   "/-/healthz",
-							Port:   intstr.FromString(echoServicePortName),
-							Scheme: "HTTP",
+						TCPSocket: &corev1.TCPSocketAction{
+							Port: intstr.FromString(echoServicePortName),
 						},
 					},
 					TimeoutSeconds:   1,
