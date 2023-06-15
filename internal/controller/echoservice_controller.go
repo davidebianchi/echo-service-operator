@@ -18,12 +18,14 @@ package controller
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/davidebianchi/echo-service-operator/api/v1alpha1"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -34,6 +36,8 @@ import (
 
 const (
 	echoServicePortName = "echo-service"
+
+	typeAvailableEchoService = "Available"
 )
 
 // EchoServiceReconciler reconciles a EchoService object
@@ -108,6 +112,18 @@ func (r *EchoServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			log.Error(err, "Failed to update Service", "Service.Namespace", svc.Namespace, "Service.Name", svc.Name)
 			return ctrl.Result{}, err
 		}
+	}
+
+	meta.SetStatusCondition(&echoService.Status.Conditions, metav1.Condition{
+		Type:    typeAvailableEchoService,
+		Status:  metav1.ConditionTrue,
+		Reason:  "Reconciling",
+		Message: fmt.Sprintf("Deployment for custom resource (%s) created successfully", echoService.Name),
+	})
+
+	if err := r.Status().Update(ctx, echoService); err != nil {
+		log.Error(err, "Failed to update EchoService status")
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
@@ -209,6 +225,22 @@ func (r *EchoServiceReconciler) getDeployment(echoService *v1alpha1.EchoService)
 							ContainerPort: 8080,
 							Name:          echoServicePortName,
 						}},
+						ReadinessProbe: &corev1.Probe{
+							ProbeHandler: corev1.ProbeHandler{
+								HTTPGet: &corev1.HTTPGetAction{
+									Port: intstr.FromString(echoServicePortName),
+									Path: "/-/ready",
+								},
+							},
+						},
+						LivenessProbe: &corev1.Probe{
+							ProbeHandler: corev1.ProbeHandler{
+								HTTPGet: &corev1.HTTPGetAction{
+									Port: intstr.FromString(echoServicePortName),
+									Path: "/-/healthz",
+								},
+							},
+						},
 					}},
 				},
 			},

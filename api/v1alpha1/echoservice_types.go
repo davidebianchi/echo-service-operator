@@ -29,9 +29,6 @@ type EchoServiceConfig struct {
 
 // EchoServiceSpec defines the desired state of EchoService
 type EchoServiceSpec struct {
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of EchoService. Edit echoservice_types.go to remove/update
 	Image    string            `json:"image,omitempty"`
 	Version  string            `json:"version,omitempty"`
 	Replicas *int32            `json:"replicas,omitempty"`
@@ -40,9 +37,7 @@ type EchoServiceSpec struct {
 
 // EchoServiceStatus defines the observed state of EchoService
 type EchoServiceStatus struct {
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// TODO:
+	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
 }
 
 //+kubebuilder:object:root=true

@@ -3,6 +3,8 @@ kind: EchoService
 metadata:
   name: echo-service
 spec:
-  replicas: 3
+  image: "custom-image"
+  version: "latest"
+  replicas: 4
   config:
-    responseDelay: 5s
+    responseDelay: 30s

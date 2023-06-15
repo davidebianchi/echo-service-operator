@@ -131,6 +131,32 @@ var _ = Describe("EchoService controller", func() {
 				},
 				TerminationMessagePath:   "/dev/termination-log",
 				TerminationMessagePolicy: "File",
+				ReadinessProbe: &corev1.Probe{
+					ProbeHandler: corev1.ProbeHandler{
+						HTTPGet: &corev1.HTTPGetAction{
+							Path:   "/-/ready",
+							Port:   intstr.FromString(echoServicePortName),
+							Scheme: "HTTP",
+						},
+					},
+					TimeoutSeconds:   1,
+					PeriodSeconds:    10,
+					SuccessThreshold: 1,
+					FailureThreshold: 3,
+				},
+				LivenessProbe: &corev1.Probe{
+					ProbeHandler: corev1.ProbeHandler{
+						HTTPGet: &corev1.HTTPGetAction{
+							Path:   "/-/healthz",
+							Port:   intstr.FromString(echoServicePortName),
+							Scheme: "HTTP",
+						},
+					},
+					TimeoutSeconds:   1,
+					PeriodSeconds:    10,
+					SuccessThreshold: 1,
+					FailureThreshold: 3,
+				},
 			}))
 			Expect(deploy.OwnerReferences).To(Equal(getOwnerRef(deploy)))
 
@@ -153,6 +179,23 @@ var _ = Describe("EchoService controller", func() {
 
 			By("Check that deploy and service selector are equal")
 			Expect(deploy.Spec.Selector.MatchLabels).To(Equal(svc.Spec.Selector))
+
+			By("Check status")
+			echoService = &v1alpha1.EchoService{}
+			Eventually(func() error {
+				return k8sClient.Get(ctx, typeNamespaceName, echoService)
+			}, time.Minute, time.Second).Should(Succeed())
+
+			Expect(echoService.Status.Conditions).To(HaveLen(1))
+			echoService.Status.Conditions[0].LastTransitionTime = metav1.Time{}
+			Expect(echoService.Status.Conditions).To(Equal([]metav1.Condition{
+				{
+					Type:    "Available",
+					Status:  "True",
+					Reason:  "Reconciling",
+					Message: "Deployment for custom resource (test-echo) created successfully",
+				},
+			}))
 
 			By("update existent EchoService", func() {
 				By("Apply the custom resource for the Kind EchoService with ResponseDelay")
