@@ -359,7 +359,6 @@ var _ = Describe("EchoService controller", func() {
 				return k8sClient.Get(ctx, typeNamespaceName, found)
 			}, time.Minute, time.Second).Should(Succeed())
 		})
-
 	})
 })
 
