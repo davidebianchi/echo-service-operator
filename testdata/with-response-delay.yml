@@ -3,6 +3,5 @@ kind: EchoService
 metadata:
   name: echo-service
 spec:
-  replicas: 3
   config:
     responseDelay: 5s
